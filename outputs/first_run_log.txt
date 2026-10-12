@@ -1,0 +1,118 @@
+﻿{'train': 144, 'val': 30, 'test': 33}
+  features 10/207
+  features 20/207
+  features 30/207
+  features 40/207
+  features 50/207
+  features 60/207
+  features 70/207
+  features 80/207
+  features 90/207
+  features 100/207
+  features 110/207
+  features 120/207
+  features 130/207
+  features 140/207
+  features 150/207
+  features 160/207
+  features 170/207
+  features 180/207
+  features 190/207
+  features 200/207
+  features 207/207
+epoch  1/30  train_loss=0.6556 train_acc=0.569  val_loss=0.6803 val_acc=0.533  <- saved (best val acc)
+epoch  2/30  train_loss=0.6266 train_acc=0.639  val_loss=0.6805 val_acc=0.567  <- saved (best val acc)
+epoch  3/30  train_loss=0.6098 train_acc=0.632  val_loss=0.7053 val_acc=0.500
+epoch  4/30  train_loss=0.5795 train_acc=0.729  val_loss=0.6932 val_acc=0.500
+epoch  5/30  train_loss=0.5711 train_acc=0.701  val_loss=0.6881 val_acc=0.600  <- saved (best val acc)
+epoch  6/30  train_loss=0.5425 train_acc=0.736  val_loss=0.6829 val_acc=0.500
+epoch  7/30  train_loss=0.5246 train_acc=0.764  val_loss=0.6854 val_acc=0.733  <- saved (best val acc)
+epoch  8/30  train_loss=0.5021 train_acc=0.778  val_loss=0.6884 val_acc=0.767  <- saved (best val acc)
+epoch  9/30  train_loss=0.4771 train_acc=0.792  val_loss=0.6867 val_acc=0.467
+epoch 10/30  train_loss=0.4046 train_acc=0.882  val_loss=0.6854 val_acc=0.500
+epoch 11/30  train_loss=0.4414 train_acc=0.806  val_loss=0.6623 val_acc=0.733
+epoch 12/30  train_loss=0.4080 train_acc=0.833  val_loss=0.6644 val_acc=0.633
+epoch 13/30  train_loss=0.3223 train_acc=0.882  val_loss=0.7452 val_acc=0.767
+epoch 14/30  train_loss=0.4272 train_acc=0.812  val_loss=0.9796 val_acc=0.467
+epoch 15/30  train_loss=0.4143 train_acc=0.847  val_loss=0.6718 val_acc=0.567
+epoch 16/30  train_loss=0.3380 train_acc=0.889  val_loss=0.6931 val_acc=0.600
+epoch 17/30  train_loss=0.3183 train_acc=0.889  val_loss=0.7189 val_acc=0.633
+epoch 18/30  train_loss=0.3275 train_acc=0.896  val_loss=0.7679 val_acc=0.567
+epoch 19/30  train_loss=0.3329 train_acc=0.896  val_loss=0.6293 val_acc=0.767
+epoch 20/30  train_loss=0.3168 train_acc=0.868  val_loss=0.7430 val_acc=0.533
+epoch 21/30  train_loss=0.3432 train_acc=0.868  val_loss=0.7152 val_acc=0.533
+epoch 22/30  train_loss=0.4074 train_acc=0.812  val_loss=0.6987 val_acc=0.767
+epoch 23/30  train_loss=0.4299 train_acc=0.771  val_loss=0.6897 val_acc=0.767
+epoch 24/30  train_loss=0.2890 train_acc=0.889  val_loss=0.6925 val_acc=0.667
+epoch 25/30  train_loss=0.2621 train_acc=0.903  val_loss=0.7525 val_acc=0.633
+epoch 26/30  train_loss=0.2228 train_acc=0.931  val_loss=0.8331 val_acc=0.633
+epoch 27/30  train_loss=0.2278 train_acc=0.917  val_loss=0.8419 val_acc=0.567
+epoch 28/30  train_loss=0.2343 train_acc=0.924  val_loss=0.7517 val_acc=0.633
+epoch 29/30  train_loss=0.2234 train_acc=0.910  val_loss=0.8366 val_acc=0.533
+epoch 30/30  train_loss=0.2793 train_acc=0.889  val_loss=0.8345 val_acc=0.500
+
+Best val accuracy: 0.767
+
+=== Validation set (used for checkpoint selection) (30 videos) ===
+Accuracy:  0.767
+Precision (shoplifting): 0.708
+Recall    (shoplifting): 1.000
+F1        (shoplifting): 0.829
+AUC-ROC:   0.593
+Confusion matrix (rows=actual, cols=pred, [normal, shoplifting]):
+[[ 6  7]
+ [ 0 17]]
+              precision    recall  f1-score   support
+
+      normal       1.00      0.46      0.63        13
+ shoplifting       0.71      1.00      0.83        17
+
+    accuracy                           0.77        30
+   macro avg       0.85      0.73      0.73        30
+weighted avg       0.83      0.77      0.74        30
+
+Misclassified:
+  dcsass_shoplifting   Shoplifting015_x264          true=0 pred=1 p=0.76
+  dcsass_shoplifting   Shoplifting032_x264          true=0 pred=1 p=0.95
+  staged_normal        normal-14                    true=0 pred=1 p=0.78
+  staged_normal        normal-21                    true=0 pred=1 p=0.76
+  staged_normal        normal-38                    true=0 pred=1 p=0.76
+  staged_normal        normal-55                    true=0 pred=1 p=0.75
+  staged_normal        normal-89                    true=0 pred=1 p=0.69
+
+Accuracy by source dataset:
+  dcsass_shoplifting     n=  4  acc=0.500
+  staged_normal          n= 11  acc=0.545
+  staged_shoplifting     n= 15  acc=1.000
+
+=== TEST set (33 videos) ===
+Accuracy:  0.788
+Precision (shoplifting): 0.739
+Recall    (shoplifting): 0.944
+F1        (shoplifting): 0.829
+AUC-ROC:   0.811
+Confusion matrix (rows=actual, cols=pred, [normal, shoplifting]):
+[[ 9  6]
+ [ 1 17]]
+              precision    recall  f1-score   support
+
+      normal       0.90      0.60      0.72        15
+ shoplifting       0.74      0.94      0.83        18
+
+    accuracy                           0.79        33
+   macro avg       0.82      0.77      0.77        33
+weighted avg       0.81      0.79      0.78        33
+
+Misclassified:
+  staged_normal        normal-13                    true=0 pred=1 p=0.73
+  staged_normal        normal-15                    true=0 pred=1 p=0.74
+  staged_normal        normal-29                    true=0 pred=1 p=0.70
+  staged_normal        normal-34                    true=0 pred=1 p=0.77
+  staged_normal        normal-41                    true=0 pred=1 p=0.80
+  staged_normal        normal-88                    true=0 pred=1 p=0.71
+  staged_shoplifting   shoplifting-78               true=1 pred=0 p=0.46
+
+Accuracy by source dataset:
+  dcsass_shoplifting     n=  4  acc=1.000
+  staged_normal          n= 15  acc=0.600
+  staged_shoplifting     n= 14  acc=0.929

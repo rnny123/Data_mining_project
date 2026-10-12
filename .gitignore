@@ -1,0 +1,5 @@
+﻿__pycache__/
+*.pyc
+# raw videos (779 MB) are not committed; see manifest.csv for the list
+cleaned_unified_deduplicated/videos/
+cleaned_unified_deduplicated/quarantine/
