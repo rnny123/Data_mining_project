@@ -1,0 +1,4 @@
+quarantined_path,dataset,source_id,reason
+quarantine/exact_duplicates/videos/normal/normal-52.mp4,staged_normal,staged/normal/normal-52,Exact duplicate of staged/normal/normal-44
+quarantine/exact_duplicates/videos/normal/normal-51.mp4,staged_normal,staged/normal/normal-51,Exact duplicate of staged/normal/normal-50
+quarantine/exact_duplicates/videos/normal/normal-56.mp4,staged_normal,staged/normal/normal-56,Exact duplicate of staged/normal/normal-55
