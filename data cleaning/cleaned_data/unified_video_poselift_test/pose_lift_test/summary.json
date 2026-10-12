@@ -1,0 +1,21 @@
+{
+  "dataset": "PoseLift",
+  "role": "external_test_only",
+  "samples_written": 47,
+  "clip_labels": {
+    "normal": 6,
+    "shoplifting": 41
+  },
+  "split_counts": {
+    "test": 47
+  },
+  "frames": 4207,
+  "person_tracks": 78,
+  "quarantined_files": 0,
+  "invalid_files_quarantined": 0,
+  "duplicate_samples_quarantined": 0,
+  "keypoint_format": "17 joints per person; x, y, confidence",
+  "non_finite_confidence_handling": "replaced with 0",
+  "clip_label_rule": "shoplifting if any frame label is 1; otherwise normal",
+  "training_or_validation_data_created": false
+}
