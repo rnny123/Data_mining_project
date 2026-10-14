@@ -1,0 +1,14 @@
+﻿ipykernel==7.4.0
+joblib==1.6.0
+lap==0.5.13
+matplotlib==3.11.2
+nbconvert==7.17.1
+nbformat==5.11.1
+numpy==2.5.3
+opencv-python==5.0.0.93
+pandas==3.0.6
+pytest==9.1.1
+scikit-learn==1.9.1
+torch==2.14.1
+torchvision==0.29.1
+ultralytics==8.4.174

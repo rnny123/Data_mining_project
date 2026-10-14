@@ -1,0 +1,7 @@
+{
+  "approach": "A",
+  "description": "Approach A: hand-crafted pose features + HistGradientBoosting",
+  "val_f1": 0.9142857142857143,
+  "val_auc": 0.8733031674208145,
+  "chosen_by": "validation F1, then validation ROC-AUC"
+}

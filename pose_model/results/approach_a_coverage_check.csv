@@ -1,0 +1,11 @@
+feature,importance,spearman_rho_with_coverage
+rwrist_speed_p90,0.066,-0.206
+rwrist_height_std,0.061,-0.18
+crouch_mean,0.04,0.312
+lelbow_angle_std,0.039,-0.158
+body_speed_p10,0.033,0.585
+relbow_angle_p90,0.028,-0.234
+rwrist_midhip_mean,0.02,-0.212
+lwrist_midhip_std,0.019,-0.252
+rwrist_rhip_mean,0.017,-0.082
+lwrist_height_p10,0.017,0.143
