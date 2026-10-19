@@ -21,7 +21,8 @@ from torch import nn
 
 # ---------------------------------------------------------------- paths
 PROJECT_DIR = Path(__file__).resolve().parent
-DATA_DIR = PROJECT_DIR.parent / "cleaned_unified_deduplicated"
+DATA_DIR = PROJECT_DIR.parent / "Baseline Model" / "cleaned_unified_deduplicated"
+CV_FOLDS_PATH = PROJECT_DIR.parent / "Baseline Model" / "outputs" / "cv_folds.csv"  # 5 folds over train, shared by all team models
 CACHE_DIR = PROJECT_DIR / "cache" / "keypoints"
 MODELS_DIR = PROJECT_DIR / "models"
 FIGURES_DIR = PROJECT_DIR / "figures"
@@ -68,6 +69,16 @@ def load_manifest() -> pd.DataFrame:
     df["video_path"] = [str(DATA_DIR / p) for p in df["relative_path"]]
     df["cache_path"] = [str(cache_path_for(p)) for p in df["relative_path"]]
     return df
+
+
+def load_cv_folds(relative_paths) -> np.ndarray:
+    """Fold number (1-5) of each training clip, looked up by video name in the shared cv_folds.csv.
+
+    The team uses StratifiedKFold(n_splits=5, shuffle=True, random_state=42) on splits/train.csv;
+    looking folds up by name (rather than re-splitting) keeps them identical even if clips are dropped.
+    """
+    folds = pd.read_csv(CV_FOLDS_PATH).set_index("name")["fold"]
+    return np.array([folds[Path(p).stem] for p in relative_paths])
 
 
 # ---------------------------------------------------------------- primary person + normalisation
