@@ -1,0 +1,12 @@
+{
+  "hidden": 64,
+  "layers": 2,
+  "dropout": 0.3,
+  "window": 32,
+  "eval_stride": 8,
+  "aggregation": "top3",
+  "best_epoch": 11,
+  "val_f1": 0.7906976744186046,
+  "val_auc": 0.6968325791855203,
+  "val_acc": 0.7
+}

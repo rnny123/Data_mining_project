@@ -10,10 +10,16 @@ Everything is written under outputs/ next to this script, so the old
 frames/, features/, splits.csv and lstm_best.pt in the parent folder are
 left untouched.
 
+After the main model is trained and evaluated, 5-fold stratified
+cross-validation is run inside the training set only (validation and test
+videos never enter the folds). The fold assignment is written to
+outputs/cv_folds.csv so other models can use the same folds.
+
 Usage:  python run_new_data.py
 """
 import os
 import csv
+import copy
 import cv2
 import numpy as np
 import torch
@@ -24,6 +30,7 @@ from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     confusion_matrix, classification_report, roc_auc_score,
 )
+from sklearn.model_selection import StratifiedKFold
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # this experiment folder
 # sets BASE_DIR to be new_data_experiment/
@@ -38,6 +45,7 @@ OUT_DIR = os.path.join(BASE_DIR, "outputs")
 
 FEATURES_DIR = os.path.join(OUT_DIR, "features")
 CHECKPOINT_PATH = os.path.join(OUT_DIR, "lstm_best.pt")
+CV_FOLDS_PATH = os.path.join(OUT_DIR, "cv_folds.csv")
 
 N_FRAMES = 60
 OUT_SIZE = (224, 224)
@@ -49,6 +57,7 @@ LR = 1e-3
 EPOCHS = 30
 BATCH_SIZE = 8
 SEED = 42
+N_FOLDS = 5
 
 preprocess = transforms.Compose([
     transforms.ToTensor(),
@@ -162,41 +171,54 @@ def run_epoch(model, loader, criterion, optimizer=None):
     return total_loss / total, correct / total
 
 
-def train(splits):
+def fit(train_rows, val_rows, verbose=True):
+    """Train for EPOCHS and return the weights with the best validation accuracy."""
     torch.manual_seed(SEED)
-    train_loader = DataLoader(FeatureDataset(splits["train"]), batch_size=BATCH_SIZE, shuffle=True)
-    val_loader = DataLoader(FeatureDataset(splits["val"]), batch_size=BATCH_SIZE)
+    train_loader = DataLoader(FeatureDataset(train_rows), batch_size=BATCH_SIZE, shuffle=True)
+    val_loader = DataLoader(FeatureDataset(val_rows), batch_size=BATCH_SIZE)
     model = LSTMClassifier()
     criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
-    best = -1.0
+    best, best_state, best_epoch = -1.0, None, 0
     for epoch in range(1, EPOCHS + 1):
         tl, ta = run_epoch(model, train_loader, criterion, optimizer)
         vl, va = run_epoch(model, val_loader, criterion)
         mark = ""
         if va > best:
-            best = va
-            torch.save(model.state_dict(), CHECKPOINT_PATH)
+            best, best_epoch = va, epoch
+            best_state = copy.deepcopy(model.state_dict())
             mark = "  <- saved (best val acc)"
-        print(f"epoch {epoch:2d}/{EPOCHS}  train_loss={tl:.4f} train_acc={ta:.3f}  "
-              f"val_loss={vl:.4f} val_acc={va:.3f}{mark}", flush=True)
+        if verbose:
+            print(f"epoch {epoch:2d}/{EPOCHS}  train_loss={tl:.4f} train_acc={ta:.3f}  "
+                  f"val_loss={vl:.4f} val_acc={va:.3f}{mark}", flush=True)
+    return best_state, best, best_epoch
+
+
+def train(splits):
+    state, best, _ = fit(splits["train"], splits["val"])
+    torch.save(state, CHECKPOINT_PATH)
     print(f"\nBest val accuracy: {best:.3f}")
 
 
 # ---------- step 5: evaluation ----------
-def evaluate(rows, title):
+def predict(state, rows):
+    """Return (labels, shoplifting probabilities) for rows under the given weights."""
     model = LSTMClassifier()
-    model.load_state_dict(torch.load(CHECKPOINT_PATH, weights_only=True))
+    model.load_state_dict(state)
     model.eval()
-    y_true, y_pred, y_prob = [], [], []
+    y_true, y_prob = [], []
     with torch.no_grad():
         for r in rows:
             feats = np.load(os.path.join(FEATURES_DIR, f"{r['name']}.npy"))
-            prob = torch.sigmoid(model(torch.from_numpy(feats).float().unsqueeze(0))).item()
+            y_prob.append(torch.sigmoid(model(torch.from_numpy(feats).float().unsqueeze(0))).item())
             y_true.append(r["label"])
-            y_pred.append(int(prob >= 0.5))
-            y_prob.append(prob)
+    return y_true, y_prob
+
+
+def evaluate(rows, title):
+    y_true, y_prob = predict(torch.load(CHECKPOINT_PATH, weights_only=True), rows)
+    y_pred = [int(p >= 0.5) for p in y_prob]
 
     print(f"\n=== {title} ({len(rows)} videos) ===")
     print(f"Accuracy:  {accuracy_score(y_true, y_pred):.3f}")
@@ -220,6 +242,46 @@ def evaluate(rows, title):
         print(f"  {ds:22s} n={len(idx):3d}  acc={acc:.3f}")
 
 
+# ---------- step 6: 5-fold cross-validation inside the training set ----------
+def cross_validate(splits):
+    """Each fold trains on 4/5 of the training videos, picks its checkpoint on the
+    fixed validation set (same rule as the main model) and is scored on the
+    held-out fifth. Validation and test videos never enter the folds."""
+    rows = splits["train"]
+    skf = StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=SEED)
+    metrics = {"accuracy": [], "precision": [], "recall": [], "f1": [], "auc": []}
+    assignment = []
+
+    print(f"\n=== {N_FOLDS}-fold cross-validation on the training set ({len(rows)} videos) ===")
+    for k, (tr_idx, ho_idx) in enumerate(skf.split(rows, [r["label"] for r in rows]), 1):
+        held_out = [rows[i] for i in ho_idx]
+        state, _, best_epoch = fit([rows[i] for i in tr_idx], splits["val"], verbose=False)
+        y_true, y_prob = predict(state, held_out)
+        y_pred = [int(p >= 0.5) for p in y_prob]
+        fold = {
+            "accuracy": accuracy_score(y_true, y_pred),
+            "precision": precision_score(y_true, y_pred, zero_division=0),
+            "recall": recall_score(y_true, y_pred),
+            "f1": f1_score(y_true, y_pred),
+            "auc": roc_auc_score(y_true, y_prob),
+        }
+        for m, v in fold.items():
+            metrics[m].append(v)
+        assignment += [(r["name"], r["label"], k) for r in held_out]
+        print(f"fold {k}: n={len(held_out)} best_epoch={best_epoch:2d}  "
+              + "  ".join(f"{m}={v:.3f}" for m, v in fold.items()), flush=True)
+
+    print("mean ± std across folds:")
+    for m, vals in metrics.items():
+        print(f"  {m:9s} {np.mean(vals):.3f} ± {np.std(vals):.3f}")
+
+    with open(CV_FOLDS_PATH, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["name", "label", "fold"])
+        writer.writerows(sorted(assignment))
+    print(f"Fold assignment written to {CV_FOLDS_PATH}")
+
+
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     rows = load_manifest()
@@ -229,6 +291,7 @@ def main():
     train(splits)
     evaluate(splits["val"], "Validation set (used for checkpoint selection)")
     evaluate(splits["test"], "TEST set")
+    cross_validate(splits)
 
 
 if __name__ == "__main__":
