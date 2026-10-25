@@ -1,8 +1,8 @@
 {
   "method": "late fusion: weighted average of P(shoplifting)",
   "formula": "p_fused = w_pose * p_pose + (1 - w_pose) * p_cnn",
-  "w_pose": 0.35,
-  "w_cnn": 0.65,
+  "w_pose": 0.45,
+  "w_cnn": 0.55,
   "threshold": 0.5,
   "chosen_by": "out-of-fold predictions on the 144 training clips (shared 5-fold CV): F1, then ROC-AUC, then closest to 0.5",
   "cv_folds": "Baseline Model/outputs/cv_folds.csv",
