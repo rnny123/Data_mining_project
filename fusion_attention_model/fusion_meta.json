@@ -1,0 +1,11 @@
+{
+  "method": "late fusion: weighted average of P(shoplifting)",
+  "formula": "p_fused = w_pose * p_pose + (1 - w_pose) * p_attention",
+  "w_pose": 0.5,
+  "w_attention": 0.5,
+  "threshold": 0.5,
+  "chosen_by": "out-of-fold predictions on the 144 training clips (shared 5-fold CV): F1, then ROC-AUC, then closest to 0.5",
+  "cv_folds": "Baseline Model/outputs/cv_folds.csv",
+  "pose_model": "pose_model/models/approach_a.joblib",
+  "attention_model": "fusion_attention_model/models/attention_lstm_best.pt"
+}
